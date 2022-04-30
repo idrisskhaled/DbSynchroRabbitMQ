@@ -17,7 +17,7 @@ public class HO {
     public void retrieve(){
         try {
             Statement statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("SELECT * FROM `product sales`");
+            ResultSet results = statement.executeQuery("SELECT * FROM `product_sales`");
             while (results.next()) {
                 String data = results.getString(1);
                 System.out.println("Fetching data by column index for row " + results.getRow() + " : " + data);

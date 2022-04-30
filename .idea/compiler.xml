@@ -9,5 +9,8 @@
         <module name="dbSynchroRabbitMQ" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="dbSynchroRabbitMQ" target="18" />
+    </bytecodeTargetLevel>
   </component>
 </project>
