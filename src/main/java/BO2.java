@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
-public class BO implements ActionListener{
+public class BO2 implements ActionListener{
     java.sql.Connection connection = null;
     JFrame f;
     JButton rollback;
@@ -77,7 +77,7 @@ public class BO implements ActionListener{
     JButton update;
     JButton delete;
     String column[]={"ID","DATE","REGION","PRODUCT","QUANTITY","COST","AMT"};
-    BO() throws IOException, TimeoutException {
+    BO2() throws IOException, TimeoutException {
         f = new JFrame();
         f.setSize(300,400);
         f.setVisible(true);
@@ -103,18 +103,18 @@ public class BO implements ActionListener{
         submit4=new JButton("rollback");
         submit4.setPreferredSize(new Dimension(200,24));
         id=new JLabel("id:");
-         date=new JLabel("date:");
-         region=new JLabel("region:");
-         product=new JLabel("product:");
-         qty=new JLabel("qty:");
-         cost=new JLabel("cost:");
-         amt=new JLabel("amt:");
-         date1=new JLabel("date:");
-         region1=new JLabel("region:");
-         product1=new JLabel("product:");
-         qty1=new JLabel("qty:");
-         cost1=new JLabel("cost:");
-         amt1=new JLabel("amt:");
+        date=new JLabel("date:");
+        region=new JLabel("region:");
+        product=new JLabel("product:");
+        qty=new JLabel("qty:");
+        cost=new JLabel("cost:");
+        amt=new JLabel("amt:");
+        date1=new JLabel("date:");
+        region1=new JLabel("region:");
+        product1=new JLabel("product:");
+        qty1=new JLabel("qty:");
+        cost1=new JLabel("cost:");
+        amt1=new JLabel("amt:");
         idt=new JTextField();
         idt.setPreferredSize( new Dimension( 100, 24 ) );
         id1=new JLabel("id:");
@@ -146,20 +146,20 @@ public class BO implements ActionListener{
         costt1.setPreferredSize( new Dimension( 120, 24 ) );
         amtt1=new JTextField();
         amtt1.setPreferredSize( new Dimension( 120, 24 ) );
-         panel1.add(date1);
-         panel1.add(datet1);
-         panel1.add(region1);
-         panel1.add(regiont1);
-         panel1.add(product1);
-         panel1.add(productt1);
-         panel1.add(qty1);
-         panel1.add(qtyt1);
-         panel1.add(cost1);
-         panel1.add(costt1);
-         panel1.add(amt1);
-         panel1.add(amtt1);
-         panel1.add(submit1);
-         panel1.setVisible(false);
+        panel1.add(date1);
+        panel1.add(datet1);
+        panel1.add(region1);
+        panel1.add(regiont1);
+        panel1.add(product1);
+        panel1.add(productt1);
+        panel1.add(qty1);
+        panel1.add(qtyt1);
+        panel1.add(cost1);
+        panel1.add(costt1);
+        panel1.add(amt1);
+        panel1.add(amtt1);
+        panel1.add(submit1);
+        panel1.setVisible(false);
         panel2.add(id);
         panel2.add(idt);
         panel2.add(date);
@@ -206,7 +206,6 @@ public class BO implements ActionListener{
         submit1.addActionListener(this);
         submit2.addActionListener(this);
         submit3.addActionListener(this);
-        submit4.addActionListener(this);
         this.insert.setBackground(new Color(0,128,0));
         this.update.setBackground(new Color(255,165,0));
         this.delete.setBackground(new Color(255,0,0));
@@ -227,21 +226,21 @@ public class BO implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==insert){
-                panel1.setVisible(true);
-                panel2.setVisible(false);
-                panel3.setVisible(false);
-                panel4.setVisible(false);
-                panel5.setVisible(false);
+            panel1.setVisible(true);
+            panel2.setVisible(false);
+            panel3.setVisible(false);
+            panel4.setVisible(false);
+            panel5.setVisible(false);
 
 
             System.out.println("insert");
         }
         if(e.getSource()==update){
-                panel1.setVisible(false);
-                panel2.setVisible(true);
-                panel3.setVisible(false);
-                panel4.setVisible(false);
-                panel5.setVisible(false);
+            panel1.setVisible(false);
+            panel2.setVisible(true);
+            panel3.setVisible(false);
+            panel4.setVisible(false);
+            panel5.setVisible(false);
 
             System.out.println("update");
         }
@@ -255,11 +254,11 @@ public class BO implements ActionListener{
             System.out.println("rollback");
         }
         if(e.getSource()==delete){
-                panel1.setVisible(false);
-                panel2.setVisible(false);
-                panel3.setVisible(true);
-                panel4.setVisible(false);
-                panel5.setVisible(false);
+            panel1.setVisible(false);
+            panel2.setVisible(false);
+            panel3.setVisible(true);
+            panel4.setVisible(false);
+            panel5.setVisible(false);
 
 
             System.out.println("delete");
@@ -276,12 +275,12 @@ public class BO implements ActionListener{
             json.put("operation","insert");
             try{
                 this.afficher();
-                EmitLog(json,"bo1-ho");
+                EmitLog(json,"bo2-ho");
             }
             catch (SQLException | IOException r){
                 r.printStackTrace();
             }
-            }
+        }
         if(e.getSource()==submit2){
             JSONObject json=new JSONObject();
             json.put("id",idt.getText());
@@ -295,7 +294,7 @@ public class BO implements ActionListener{
             json.put("operation","update");
             try{
                 this.afficher();
-                EmitLog(json,"bo1-ho");
+                EmitLog(json,"bo2-ho");
             }
             catch (SQLException | IOException r){
                 r.printStackTrace();
@@ -308,7 +307,7 @@ public class BO implements ActionListener{
             json.put("operation","delete");
             try{
                 this.afficher();
-                EmitLog(json,"bo1-ho");
+                EmitLog(json,"bo2-ho");
             }
             catch (SQLException | IOException r){
                 r.printStackTrace();
@@ -321,19 +320,18 @@ public class BO implements ActionListener{
             json.put("operation","rollback");
             try{
                 this.afficher();
-                EmitLog(json,"bo1-ho");
+                EmitLog(json,"bo2-ho");
             }
             catch (SQLException | IOException r){
                 r.printStackTrace();
             }
         }
-        }
+    }
 
     private void rollback(JSONObject json) {
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("UPDATE `product sales` set `deletedAt`=null where id='"+json.get("id")+"'");
-            System.out.println("rollbacking");
         } catch (SQLException e) {
             System.out.println("Could not retrieve data from the database " + e.getMessage());
         }
@@ -425,7 +423,7 @@ public class BO implements ActionListener{
             String driverName = "com.mysql.jdbc.Driver";
             Class.forName(driverName);
             String serverName = "localhost";
-            String schema = "bo1";
+            String schema = "bo2";
             String url = "jdbc:mysql://" + serverName + "/" + schema;
             String username = "root";
             String password = "";
@@ -446,7 +444,7 @@ public class BO implements ActionListener{
         Channel channel = connection.createChannel();
         channel.exchangeDeclare("exchange", "direct", true);
         String queueName = channel.queueDeclare().getQueue();
-        channel.queueBind(queueName, "exchange", "ho-bo1");
+        channel.queueBind(queueName, "exchange", "ho-bo2");
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
@@ -471,7 +469,7 @@ public class BO implements ActionListener{
         });
     }
     public void EmitLog(JSONObject obj, String Queue_name) throws IOException {
-        obj.put("sender","bo1");
+        obj.put("sender","bo2");
         String message = obj.toString();
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -487,7 +485,7 @@ public class BO implements ActionListener{
     }
 
     public static void main(String[] args) throws  Exception{
-        BO bo=new BO();
+        BO2 bo2=new BO2();
     }
 
 

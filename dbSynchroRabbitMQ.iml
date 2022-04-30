@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/jars/mysql-connector-java-5.1.15-bin.jar!/" />
+          <root url="jar://$MODULE_DIR$/src/jars/mysql-database-1.8.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/jars/mysql-database-1.8.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/src/jars/mysql-connector-java-5.1.15-bin.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
