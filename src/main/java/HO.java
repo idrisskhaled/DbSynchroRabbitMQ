@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
@@ -14,36 +13,34 @@ import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 
 public class HO {
     java.sql.Connection connection = null;
     JFrame frame;
+    String column[] = {"Id","Date","Region","Product","Qty","Cost","Amt"};
+    DefaultTableModel model;
     JPanel panel;
-    String data[][] = new String[10][7];
-    public void retrieve(){
+    JTable table;
+    public ResultSet retrieve(){
         try {
             Statement statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("SELECT * FROM `product sales`");
-            int i=0;
-            while (results.next()) {
-                data[i]= new String[]{results.getString(1),results.getString(2),results.getString(3),results.getString(4),results.getString(6),results.getString(7),results.getString(8)};
-                i++;
-            }
+            ResultSet results = statement.executeQuery("SELECT id ,date,Region,Product,Qty,Cost,Amt FROM `product sales` where deletedAt is null");
+            return results;
         } catch (SQLException e) {
             System.out.println("Could not retrieve data from the database " + e.getMessage());
         }
+        return null;
     }
     public void update(JSONObject message){
         try {
-            PreparedStatement stmt = connection.prepareStatement("UPDATE `product sales` SET `Date`=?, `Region`=?, `Product`=?, `deletedAt`=?, `Qty`=?, `Cost`=?, `Amt`=? ");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE `product sales` SET `Date`=?, `Region`=?, `Product`=?, `Qty`=?, `Cost`=?, `Amt`=? WHERE  `id`=?");
             stmt.setString(2, (String) message.get("region"));
             stmt.setString(3, (String) message.get("product"));
-            stmt.setDate(1, (Date) message.get("date"));
-            stmt.setDate(4, (Date) message.get("deletedAt"));
-            stmt.setInt(5, (Integer) message.get("qty"));
-            stmt.setFloat(6,(Float)message.get("cost"));
-            stmt.setFloat(7,(Float)message.get("amt"));
+            stmt.setString(1, (String) message.get("date"));
+            stmt.setString(4, (String) message.get("qty"));
+            stmt.setString(5,(String)message.get("cost"));
+            stmt.setString(6,(String)message.get("amt"));
+            stmt.setString(7,(String)message.get("id") );
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Could not update data" + e.getMessage());
@@ -51,14 +48,13 @@ public class HO {
     }
     public void insert(JSONObject message){
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO `product sales`(`Date`, `Region`, `Product`, `deletedAt`, `Qty`, `Cost`, `Amt`) VALUES (?,?,?,?,?,?,?)");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO `product sales`(`Date`, `Region`, `Product`, `Qty`, `Cost`, `Amt`) VALUES (?,?,?,?,?,?)");
             stmt.setString(2, (String) message.get("region"));
             stmt.setString(3, (String) message.get("product"));
-            stmt.setDate(1, (Date) message.get("date"));
-            stmt.setDate(4, (Date) message.get("deletedAt"));
-            stmt.setInt(5, (Integer) message.get("qty"));
-            stmt.setFloat(6,(Float)message.get("cost"));
-            stmt.setFloat(7,(Float)message.get("amt"));
+            stmt.setString(1, (String) message.get("date"));
+            stmt.setString(4, (String) message.get("qty"));
+            stmt.setString(5,(String)message.get("cost"));
+            stmt.setString(6,(String)message.get("amt"));
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Could not insert data" + e.getMessage());
@@ -67,7 +63,7 @@ public class HO {
     public void delete(JSONObject message){
         try {
             Statement statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("DELETE from `product sales` WHERE id="+message.get("id"));
+            statement.executeUpdate("DELETE from `product sales` WHERE id="+message.get("id"));
         } catch (SQLException e) {
             System.out.println("Could not delete data" + e.getMessage());
         }
@@ -97,39 +93,96 @@ public class HO {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         channel.exchangeDeclare("exchange", "direct", true);
-        String queueName = channel.queueDeclare().getQueue();
+        String queueName1 = channel.queueDeclare().getQueue();
+        channel.queueBind(queueName1, "exchange", "bo1-ho");
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             System.out.println(" [x] Received '" +
                     delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
             JSONParser parser = new JSONParser();
-            JSONObject json = null;
+            JSONObject json;
             try {
                 json = (JSONObject) parser.parse(message);
                 if(json.get("operation").equals("update")){update(json);}
                 else if(json.get("operation").equals("insert")){insert(json);}
                 else if(json.get("operation").equals("delete")){delete(json);}
+                afficher();
+                if(json.get("sender").equals("bo2"))EmitLog(json,"ho-bo1");
+                else if(json.get("sender").equals("bo1"))EmitLog(json,"ho-bo2");
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         };
-        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+        channel.basicConsume(queueName1, true, deliverCallback, consumerTag -> {
+        });
+        String queueName2 = channel.queueDeclare().getQueue();
+        channel.queueBind(queueName2, "exchange", "bo2-ho");
+        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+        DeliverCallback deliverCallback2 = (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            System.out.println(" [x] Received '" +
+                    delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+            JSONParser parser = new JSONParser();
+            JSONObject json;
+            try {
+                json = (JSONObject) parser.parse(message);
+                if(json.get("operation").equals("update")){update(json);}
+                else if(json.get("operation").equals("insert")){insert(json);}
+                else if(json.get("operation").equals("delete")){delete(json);}
+                afficher();
+                if(json.get("sender").equals("bo2"))EmitLog(json,"ho-bo1");
+                else if(json.get("sender").equals("bo1"))EmitLog(json,"ho-bo2");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        };
+        channel.basicConsume(queueName2, true, deliverCallback2, consumerTag -> {
         });
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, IOException, TimeoutException {
         new HO();
+    }
+    public void EmitLog(JSONObject obj, String Queue_name) throws IOException {
+        String message = obj.toString();
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost("localhost");
+        try (Connection connection = factory.newConnection();
+             Channel channel = connection.createChannel()) {
+            channel.exchangeDeclare("exchange", "direct", true);
+            channel.basicPublish("exchange", Queue_name, null, message.getBytes(StandardCharsets.UTF_8));
+            System.out.println(" [x] Sent '" + message + "'");
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
 
     }
-    public HO(){
+    public void afficher() {
+        ResultSet results=this.retrieve();
+        model=new DefaultTableModel(column,0);
+        String data[]=new String[7];
+        try {
+            while (results.next()) {
+                for(int j=1;j<8;j++) {
+                    String row = results.getString(j);
+                    data[j-1]=row;
+                }
+                model.addRow(data);
+            }
+            table.setModel(model);
+
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public HO() throws SQLException, IOException, TimeoutException {
         connection();
-        retrieve();
+        model=new DefaultTableModel(column,0);
         frame = new JFrame("HO");
         panel = new JPanel();
-        String col[] = {"Id","Date","Region","Product","Qty","Cost","Amt"};
-        JTable table = new JTable(data,col);
+        table = new JTable(model);
         JScrollPane pane = new JScrollPane(table);
-        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         panel.add(pane);
         frame.add(panel);
         frame.setSize(500,150);
@@ -137,6 +190,8 @@ public class HO {
         frame.getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        afficher();
+        basicConsume();
 
     }
 }
