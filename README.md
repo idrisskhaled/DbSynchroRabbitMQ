@@ -1,5 +1,5 @@
 
-# DbSynchro
+# DbSynchro with RabbitMQ
 
 - The main of this lab is to create a distributed application that synchronisation databases from the product sales tables. This application needs to use the RabbitMQ to
 send data on the related queues. We run 2 distributed processes that synchronise data from first BO to HO and the second BO to the HO.
